@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ZH-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        body,div{
+            margin:0;
+            padding:0;
+        }
+        #d1{
+            width:500px;
+            height: 400px;
+            border: 2px solid #00FFD1;
+        }
+    </style>
+</head>
+<body>
+
+
+<div id="d1">
+    <canvas id="myCanvas" width="500" height="400">
+        <p>您的系统不支持此程序!</p>
+    </canvas>
+    <button id="invertbtn">invertbtn</button>
+    <button id="grayscalebtn">grayscalebtn</button>
+    <button id="lightbtn">lightbtn</button>
+    <button id="contrastbtn">contrastbtn</button>
+    
+    <canvas id="canvas" width="500" height="400">
+        <p>您的系统不支持此程序!</p>
+    </canvas>
+</div>
+
+<script>
+    const canva=document.getElementById("myCanvas");
+    const cansText=canva.getContext("2d");
+
+    let img = new Image();
+     img.onload = function() {     	
+     	cansText.drawImage(img,canva.width / 2 - img.width / 2,canva.height / 2 - img.height / 2);
+     }
+    img.src="http://www.w3school.com.cn/i/ct_html5_canvas_circle.gif";
+    //在事件外声明需要用到的变量
+    let ox = canva.width / 2 - img.width / 2;
+    let oy = canva.height / 2 - img.height / 2;
+
+    canva.onmousedown=function (e) {
+    	 console.log('mouse down');
+        canva.onmousemove = function(e){
+        	console.log('mouse move')
+             x= e.clientX;y=e.clientY;
+
+            //先清除之前的然后重新绘制
+            cansText.clearRect(0,0,canva.width,canva.height);
+            cansText.drawImage(img,x- img.width/2,y-img.height/2);
+        };
+
+        canva.onmouseup = function(){
+            canva.onmousemove = null;
+            canva.onmouseup = null;
+        };
+    }
+    
+    
+    var imgObj = new Image();
+imgObj.src = './img/face.jpg';
+imgObj.onload = function() {
+  draw(this);
+};
+
+function draw(imgObj) {
+  var canvas = document.getElementById('canvas');
+  var ctx = canvas.getContext('2d');
+  ctx.drawImage(imgObj, 0, 0);
+  imgObj.style.display = 'none';
+  var imageData = ctx.getImageData(0,0,canvas.width, canvas.height);
+  var data = imageData.data;
+    
+  var invert = function() {
+    for (var i = 0; i < data.length; i += 4) {
+      data[i]     = 255 - data[i];     // red
+      data[i + 1] = 255 - data[i + 1]; // green
+      data[i + 2] = 255 - data[i + 2]; // blue
+    }
+    ctx.putImageData(imageData, 0, 0);
+  };
+
+  var grayscale = function() {
+    for (var i = 0; i < data.length; i += 4) {
+      var avg = (data[i] + data[i +1] + data[i +2]) / 3;
+      data[i]     = avg; // red
+      data[i + 1] = avg; // green
+      data[i + 2] = avg; // blue
+    }
+    console.log('grayscale')
+    ctx.putImageData(imageData, 0, 0);
+  };
+  
+  var light = function(){
+  	console.log('add')
+  	for (var i = 0; i < data.length; i += 4) {
+      data[i]     = data[i] +1>255?255:data[i] +1;     // red
+      data[i + 1] = data[i + 1] + 1>255?255:data[i + 1] + 1; // green
+      data[i + 2] = data[i + 2] + 1>255?255:data[i + 2] + 1; // blue
+    }
+    ctx.putImageData(imageData, 0, 0);
+  };
+  var applyBrightness = function(data, brightness) {
+    for (var i = 0; i < data.length; i+= 4) {
+      data[i] += 255 * (brightness / 100);
+      data[i+1] += 255 * (brightness / 100);
+      data[i+2] += 255 * (brightness / 100);
+    }
+  };
+
+  var truncateColor = function(value) {
+    if (value < 0) {
+      value = 0;
+    } else if (value > 255) {
+      value = 255;
+    }
+
+    return value;
+  };
+
+  var applyContrast = function() {
+  	console.log('start')
+  	var contrast = -100;
+    var factor = (259.0 * (contrast + 255.0)) / (255.0 * (259.0 - contrast));
+
+    for (var i = 0; i < data.length; i+= 4) {
+      data[i] = truncateColor(factor * (data[i] - 128.0) + 128.0);
+      data[i+1] = truncateColor(factor * (data[i+1] - 128.0) + 128.0);
+      data[i+2] = truncateColor(factor * (data[i+2] - 128.0) + 128.0);
+    }
+    console.log('over')
+    ctx.putImageData(imageData, 0, 0);
+  };
+
+  var invertbtn = document.getElementById('invertbtn');
+  invertbtn.addEventListener('click', invert);
+  
+  var grayscalebtn = document.getElementById('grayscalebtn');
+  grayscalebtn.addEventListener('click', grayscale);
+  
+  var lightbtn = document.getElementById('lightbtn');
+  lightbtn.addEventListener('click', light);
+  
+  var contrastbtn = document.getElementById('contrastbtn');
+  contrastbtn.addEventListener('click', applyContrast);
+  
+  
+}
+
+</script>
+</body>
+</html>

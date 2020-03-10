@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>ps工具</title>
+		<style type="text/css">
+			.btns{
+				background: #fe0;
+				padding: 15px;
+			}
+			button{
+				background: #fff;
+				/*width: 60px;*/
+				height: 50px;
+				border: 1px solid #21abe0;
+				border-radius: 5px;
+			}
+			#myCanvas{
+				width: 100%;
+				height: 800px;
+				border: 1px solid red;
+				background: #eee;
+			}
+		</style>
+	</head>
+	<body>
+		<div>
+			<div class="btns">
+				<button onclick="todo(1)">剪裁</button>	<!--支持拖拽选框剪裁图片-->
+				<button onclick="todo(2)">旋转*</button>
+				<button onclick="todo('2.1')">水平翻转*</button>
+				<button onclick="todo('2.2')">垂直翻转*</button>
+				<button onclick="todo(3)">缩放*</button>
+				<input type="range" name="scale" id="scalebtn" value="1" min="0.1" max="3" step="0.1" onchange="changeRange(this)"/>
+				<!--<button onclick="todo('3.1')">放大*</button>
+				<button onclick="todo('3.2')">缩小*</button>-->
+				<button onclick="todo(4)">亮度*</button>	<!--调图片亮度-->
+				<input type="range" name="light" id="lightbtn" value="0" min="-100" max="100" step="1" onchange="changeRange(this)"/>
+				<!--<button onclick="todo('4.1')">亮度++</button>
+				<button onclick="todo('4.2')">亮度--</button>-->
+				<button onclick="todo(5)">对比度*</button>	
+				<input type="range" name="contrast" id="contrastbtn" value="0" min="-100" max="100" step="1" onchange="changeRange(this)"/>
+				<!--<button onclick="todo('5.1')">对比度++</button>
+				<button onclick="todo('5.2')">对比度--</button>-->
+				<button onclick="todo(6)">自然饱和度*</button> <!--调饱和度-->
+				<input type="range" name="saturation" id="saturationtbtn" value="0" min="-100" max="100" step="1" onchange="changeRange(this)"/>
+				<!--<button onclick="todo('6.1')">自然饱和度++</button>
+				<button onclick="todo('6.2')">自然饱和度--</button>-->
+				<button onclick="todo(7)">色彩平衡</button> <!--调RGB值-->
+				<button onclick="todo(8)">黑白</button>	
+				<button onclick="todo(9)">曲线</button>
+				<button onclick="todo(10)">截图</button>
+				<button onclick="todo(11)">比对</button>		<!--处理之后图片和处理之前图片比对-->
+				<button onclick="todo(12)">拖拽*</button>
+				<button onclick="todo(13)">保存</button>		<!--生成图片-->
+				<button onclick="todo(14)">重置</button>		<!--取消所有操作-->
+				<button onclick="todo(15)">取消</button>		<!--退回上一步操作，同ctrl+z-->
+			</div>			
+			<canvas id="myCanvas" width="1500" height="800"></canvas>
+		</div>
+		<script src="js/index.js" type="text/javascript" charset="utf-8"></script>
+	</body>
+</html>

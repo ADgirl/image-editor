@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<!-- Either include the full CamanJS code including plugins -->
+<script type="text/javascript" src="js/caman.full.js"></script>
+
+<!-- Or include the core library and some plugins/filters -->
+<script type="text/javascript" src="js/caman.js"></script>
+<!--<script type="text/javascript" src="plugins/myplugin.js"></script>-->
+	</head>
+	<body>
+		<canvas id="canvas-id" width="300" height="300"></canvas>
+		<button id="contrastbtn" onclick="contrastbtn()">contrastbtn</button>
+		<script type="text/javascript">
+			var canvas = document.getElementById('canvas-id');
+			var ctx = canvas.getContext('2d');
+//			Caman("#canvas-id", "./img/face.jpg", function () {
+//// manipulate image here
+//this.brightness(50).render();
+//});
+var imageData = [];
+var v = {};
+		var imageObj = new Image();
+	 	imageObj.src = './img/face.jpg';
+		imageObj.onload = function() {
+			console.log(imageObj.width);
+			console.log(imageObj.height);
+		   ctx.drawImage(imageObj, canvas.width / 2 - imageObj.width / 2, canvas.height / 2 - imageObj.height / 2,imageObj.width,imageObj.height);
+//		   _this.img = imageObj;
+//		   _this.img.width = imageObj.width;
+//		   _this.img.height = imageObj.height;
+			imageData = ctx.getImageData(0,0,canvas.width, canvas.height);
+			v = {
+				x: 0,
+				y: 0,
+				m: imageObj.width,
+				Q: imageObj.height,
+			};
+		};
+		function contrastbtn(){
+			console.log(v)
+			sU(ctx, canvas.width,canvas.height,v,imageData.data,v,false);
+		}
+		var mZ = function(O, i, p, V) {
+        V = Math.log(V) / Math.log(2);
+        V = Math.round(V);
+        for (var E = 0; E < p; E++)
+            for (var u = 0; u < i; u++) {
+                var F = E * i + u << 2
+                  , m = (E >> V) + (u >> V) & 1 == 1 ? 204 : 255;
+                O[F] = O[F + 1] = O[F + 2] = m;
+                O[F + 3] = 255
+            }
+   }
+
+var sU = function(O, i, p, V, E, u, F) {
+//      n.DR.$B(O, i, p);
+        i = Math.floor(i * 1);
+        p = Math.floor(p * 1);
+        if (i * p == 0)
+            return;
+        var m = O.createImageData(i, p)
+          , y = m.data
+          , z = 1 / i
+          , _ = 1 / p
+          , W = 1 / 255;
+        mZ(y, i, p, 4);
+        var G = u.x
+          , J = u.x + u.m
+          , v = u.y
+          , j = u.y + u.Q;
+        for (var D = 0; D < p; D++)
+            for (var r = 0; r < i; r++) {
+                var P = D * i + r
+                  , N = P * 4
+                  , T = Math.round(V.x + r * z * V.m)
+                  , b = Math.round(V.y + D * _ * V.Q);
+                if (T < G || T >= J || b < v || b >= j) {} else {
+                    var g = y[N]
+                      , L = y[N + 1]
+                      , a = y[N + 2]
+                      , x = y[N + 3]
+                      , K = (b - u.y) * u.m + (T - u.x) << 2;
+                    x = E[K + 3] * W;
+                    g = E[K + 0] * x + g * (1 - x);
+                    L = E[K + 1] * x + L * (1 - x);
+                    a = E[K + 2] * x + a * (1 - x);
+                    y[N] = g;
+                    y[N + 1] = L;
+                    y[N + 2] = a;
+                    y[N + 3] = 255
+                }
+            }
+            console.log(m)
+        O.putImageData(m, 0, 0);
+//      if (F)
+//          n.DR.eY(O, i, p)
+    }
+		</script>
+	</body>
+</html>
