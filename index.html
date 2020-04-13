@@ -16,10 +16,11 @@
 				border-radius: 5px;
 			}
 			#myCanvas{
-				width: 100%;
+				width: 800px;
 				height: 800px;
 				border: 1px solid red;
 				background: #eee;
+				display: inline-block;
 			}
 		</style>
 	</head>
@@ -30,23 +31,27 @@
 				<button onclick="todo(2)">旋转*</button>
 				<button onclick="todo('2.1')">水平翻转*</button>
 				<button onclick="todo('2.2')">垂直翻转*</button>
-				<button onclick="todo(3)">缩放*</button>
+				
+				<button onclick="adjustSave(3)">缩放*</button>
 				<input type="range" name="scale" id="scalebtn" value="1" min="0.1" max="3" step="0.1" onchange="changeRange(this)"/>
-				<!--<button onclick="todo('3.1')">放大*</button>
-				<button onclick="todo('3.2')">缩小*</button>-->
-				<button onclick="todo(4)">亮度*</button>	<!--调图片亮度-->
+				
+				<button onclick="adjustSave(4)">亮度*</button>	<!--调图片亮度-->
 				<input type="range" name="light" id="lightbtn" value="0" min="-100" max="100" step="1" onchange="changeRange(this)"/>
-				<!--<button onclick="todo('4.1')">亮度++</button>
-				<button onclick="todo('4.2')">亮度--</button>-->
-				<button onclick="todo(5)">对比度*</button>	
+				
+				<button onclick="adjustSave()">对比度*</button>	
 				<input type="range" name="contrast" id="contrastbtn" value="0" min="-100" max="100" step="1" onchange="changeRange(this)"/>
-				<!--<button onclick="todo('5.1')">对比度++</button>
-				<button onclick="todo('5.2')">对比度--</button>-->
-				<button onclick="todo(6)">自然饱和度*</button> <!--调饱和度-->
+				
+				<button onclick="adjustSave(6)">自然饱和度*</button> <!--调饱和度-->
 				<input type="range" name="saturation" id="saturationtbtn" value="0" min="-100" max="100" step="1" onchange="changeRange(this)"/>
-				<!--<button onclick="todo('6.1')">自然饱和度++</button>
-				<button onclick="todo('6.2')">自然饱和度--</button>-->
-				<button onclick="todo(7)">色彩平衡</button> <!--调RGB值-->
+				
+				<button onclick="adjustSave(7)">色彩平衡</button> <!--调RGB值-->
+				R:
+				<input type="range" name="colorR" id="colorRbtn" value="0" min="-100" max="100" step="1" onchange="changeRange(this)"/>
+				G:
+				<input type="range" name="colorG" id="colorGbtn" value="0" min="-100" max="100" step="1" onchange="changeRange(this)"/>
+				B:
+				<input type="range" name="colorB" id="colorBbtn" value="0" min="-100" max="100" step="1" onchange="changeRange(this)"/>
+				
 				<button onclick="todo(8)">黑白</button>	
 				<button onclick="todo(9)">曲线</button>
 				<button onclick="todo(10)">截图</button>
@@ -56,7 +61,10 @@
 				<button onclick="todo(14)">重置</button>		<!--取消所有操作-->
 				<button onclick="todo(15)">取消</button>		<!--退回上一步操作，同ctrl+z-->
 			</div>			
-			<canvas id="myCanvas" width="1500" height="800"></canvas>
+			<canvas id="myCanvas" width="800" height="800"></canvas>
+			<div style="width: 500px;height: 800px;display: inline-block;">
+				<img id="showImg" src="img/face.jpg" style="width:100%;height: 100%;object-fit: contain;"/>
+			</div>
 		</div>
 		<script src="js/index.js" type="text/javascript" charset="utf-8"></script>
 	</body>

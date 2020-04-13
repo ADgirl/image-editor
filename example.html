@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<div class="image-editor-box">
+            <div class="center-content">
+                <!-- 菜单 -->
+                <div class="canvas-top-tool">
+                    <!-- <template v-if="cmSrc && smSrc">
+                        <RadioGroup v-model="canvasDirection" @on-change="switchDirection">
+                            <Radio label="horizental" border>并列</Radio>
+                            <Radio label="vertical" border>竖排</Radio>
+                        </RadioGroup>
+                    </template> -->
+                    <template v-if="cropBtn">
+                        <Button type="primary" icon="md-close" @click="changeUpTools(0)">取消</Button>
+                        <Button type="primary" icon="md-checkmark" @click="changeUpTools(1)">剪裁</Button>
+                    </template>
+                    <template v-else-if="zoomBtn">
+                        <Button icon="md-remove" type="primary" :ghost="active === 2" @click="changeUpTools(2)">缩小</Button>
+                        <Button icon="md-add" type="primary" :ghost="active === 3" @click="changeUpTools(3)">放大</Button>
+                    </template>
+                    <template v-else-if="rotateBtn">
+                        <Button type="primary" :ghost="active === 4" @click="changeUpTools(4)">旋转90°</Button>
+                        <Button type="primary" :ghost="active === 5" @click="changeUpTools(5)">水平翻转</Button>
+                        <Button type="primary" :ghost="active === 6" @click="changeUpTools(6)">垂直翻转</Button>
+                    </template>
+                    <template v-if="rulerBtn">
+                        <Button :type="active === 7?'ghost':'primary'" @click="changeUpTools(7)">隐藏标尺</Button>
+                        <Button :type="active === 8?'ghost':'primary'" @click="changeUpTools(8)">显示标尺</Button>
+                    </template>
+                </div>
+                <div class="canvas-bottom-content">
+                    <div class="left-menu">
+                        <ul>
+                            <li :class="{'active-btn':currentAction===0}" @click="handleClickTool(0,'移动')" title="移动"><Icon size="26" type="md-move" /></li>
+                            <li :class="{'active-btn':currentAction===1}" @click="handleClickTool(1,'标尺')" title="标尺"><Icon size="22" custom="i-icon-ruler" class="i-icon icon" /></li>
+                            <li :class="{'active-btn':currentAction===2}" @click="handleClickTool(2,'剪裁')" title="剪裁"><Icon size="26" type="md-crop" /></li>
+                            <li :class="{'active-btn':currentAction===3}" @click="handleClickTool(3,'旋转')" title="旋转"><Icon size="26" type="md-refresh" /></li>
+                            <li :class="{'active-btn':currentAction===4}" @click="handleClickTool(4,'缩放')" title="缩放"><Icon size="26" type="ios-contract" /></li>
+                            <li :class="{'active-btn':currentAction===5}" @click="handleClickTool(5,'亮度')" title="亮度"><Icon size="22" custom="i-icon-lightness" class="i-icon icon" /></li>
+                            <li :class="{'active-btn':currentAction===6}" @click="handleClickTool(6,'对比度')" title="对比度"><Icon size="26" type="md-contrast" /></li>
+                            <li :class="{'active-btn':currentAction===7}" @click="handleClickTool(7,'自然饱和度')" title="自然饱和度"><Icon size="22" custom="i-icon-saturation" class="i-icon icon" /></li>
+                            <li :class="{'active-btn':currentAction===8}" @click="handleClickTool(8,'色彩平衡')" title="色彩平衡"><Icon size="22" custom="i-icon-balancer" class="i-icon icon" /></li>
+                            <li :class="{'active-btn':currentAction===9}" @click="handleClickTool(9,'重置')" title="重置"><Icon size="26" type="ios-loading" /></li>
+                            <!-- <li :class="{'active-btn':currentAction===10}" @click="handleClickTool(9,'黑白')">黑白</li>
+                            <li :class="{'active-btn':currentAction===11}" @click="handleClickTool(10,'曲线')">曲线</li>
+                            <li :class="{'active-btn':currentAction===12}" @click="handleClickTool(11,'曝光度')">曝光度</li>
+                            <li :class="{'active-btn':currentAction===13}" @click="handleClickTool(12,'插入图形')">插入图形</li>
+                            <li :class="{'active-btn':currentAction===14}" @click="handleClickTool(13,'对比')">对比</li> -->
+                        </ul>
+                    </div> 
+                    <div class="canvas-box" ref="ruleBox">
+                        <!-- <template v-if="canvasDirection === 'horizental'"> -->
+                            <!-- 检材图片显示 -->
+                            <div 
+                                ref="canvasWrapperLeft" 
+                                class="canvas-wraper" 
+                                @click.stop="switchActive('left')"
+                                :style="{width:smSrc?wrapWidth+'px':wrapWidth +'px',height:wrapHeight+'px','border-color':activeImage === 'left'?'red':'inherit'}"
+                                >
+
+                                <canvas ref="myCanvasLeft" :width="smSrc?wrapWidth:wrapWidth" :height="wrapHeight"></canvas>
+                            </div>
+                            <!-- 样本图片显示 -->
+                            <div 
+                                v-if="smSrc" 
+                                ref="canvasWrapperRight" 
+                                class="canvas-wraper" 
+                                @click.stop="switchActive('right')"
+                                :style="{width:wrapWidth+'px',height:wrapHeight+'px',left:wrapWidth+20+'px','border-color':activeImage === 'right'?'red':'inherit'}"
+                                >
+
+                                <canvas ref="myCanvasRight" :width="wrapWidth" :height="wrapHeight"></canvas>
+                            </div>
+                        <!-- </template> -->
+                        <!-- <template v-else>
+                            <!-- 检材图片显示 -->
+                            <!-- <div 
+                                ref="canvasWrapperLeft" 
+                                class="canvas-wraper" 
+                                @click.capture="switchActive('left')"
+                                :style="{width:smSrc?wrapWidth+'px':wrapWidth +'px',height:wrapHeight*0.49+'px','border-color':activeImage === 'left'?'red':'inherit'}"
+                                >
+
+                                <canvas ref="myCanvasLeft" :width="smSrc?wrapWidth:wrapWidth" :height="wrapHeight*0.49"></canvas>
+                            </div> -->
+                            <!-- 样本图片显示 -->
+                            <!-- <div 
+                                v-if="smSrc" 
+                                ref="canvasWrapperRight" 
+                                class="canvas-wraper" 
+                                @click.capture="switchActive('right')"
+                                :style="{width:wrapWidth+'px',height:wrapHeight*0.49+'px',top:wrapHeight*0.49+20+'px','border-color':activeImage === 'right'?'red':'inherit'}"
+                                >
+
+                                <canvas ref="myCanvasRight" :width="wrapWidth" :height="wrapHeight*0.49"></canvas>
+                            </div> -->
+                        <!-- </template> --> 
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="right-content">
+                <template v-if="cmSrc && !smSrc">
+                    <h5>操作记录</h5>
+                    <p v-for="record in recordList">-  {{record}}</p>
+                </template>
+                <template v-else>
+                    <h5>操作记录(检材)</h5>
+                   <div class="right-content-pbox">
+                        <p v-for="record in recordList">-  {{record}}</p>
+                    </div>
+                    <h5>操作记录(样本)</h5>
+                    <div class="right-content-pbox">
+                        <p v-for="record2 in recordList2">-  {{record2}}</p>
+                    </div>
+                </template>
+            </div>
+            <!-- 色彩调整 -->
+            <Modal v-model="showAjustModal" :title="title" @on-ok="confirmRevise" @on-cancel="backToUp" draggable class-name="ajust-modal-style">
+                    <!-- <div v-if="scale.show" class="slider-style">
+                        <p>{{scale.name}}:</p>
+                        <Slider v-if="activeImage==='left'" v-model="scale.value" :step="0.1" :min="0.5" :max="3" @on-change="changeScale"></Slider>
+                        <Slider v-else v-model="scale.value2" :step="0.1" :min="0.5" :max="3" @on-change="changeScale"></Slider>
+                    </div> -->
+                    <div v-if="light.show" class="slider-style">
+                        <p>{{light.name}}:</p>
+                        <Slider v-if="activeImage==='left'" v-model="light.value" :step="1" :min="-100" :max="100" @on-change="changeLight"></Slider>
+                        <Slider v-else v-model="light.value2" :step="1" :min="-100" :max="100" @on-change="changeLight"></Slider>
+                    </div>
+                    <div v-if="contrast.show" class="slider-style">
+                        <p>{{contrast.name}}:</p>
+                        <Slider v-if="activeImage==='left'" v-model="contrast.value" :step="1" :min="-100" :max="100" @on-change="changeContrast"></Slider>
+                        <Slider v-else v-model="contrast.value2" :step="1" :min="-100" :max="100" @on-change="changeContrast"></Slider>
+                    </div>
+                    <div v-if="saturation.show" class="slider-style">
+                        <p>{{saturation.name}}:</p>
+                        <Slider v-if="activeImage==='left'" v-model="saturation.value" :step="1" :min="-100" :max="100" @on-change="changeSaturation"></Slider>
+                        <Slider v-else v-model="saturation.value2" :step="1" :min="-100" :max="100" @on-change="changeSaturation"></Slider>
+                    </div>
+                    <template v-if="colorBalance.show">
+                        <div class="slider-style">
+                            <p>R:</p>
+                            <Slider v-if="activeImage==='left'" v-model="colorBalance.values.R" :step="1" :min="-100" :max="100" @on-change="changeRBalance"></Slider>
+                            <Slider v-else v-model="colorBalance.values2.R" :step="1" :min="-100" :max="100" @on-change="changeRBalance"></Slider>
+                        </div>
+                        <div class="slider-style">
+                            <p>G:</p>
+                            <Slider v-if="activeImage==='left'" v-model="colorBalance.values.G" :step="1" :min="-100" :max="100" @on-change="changeGBalance"></Slider>
+                            <Slider v-else v-model="colorBalance.values2.G" :step="1" :min="-100" :max="100" @on-change="changeGBalance"></Slider>
+                        </div>
+                        <div class="slider-style">
+                            <p>B:</p>
+                            <Slider v-if="activeImage==='left'" v-model="colorBalance.values.B" :step="1" :min="-100" :max="100" @on-change="changeBBalance"></Slider>
+                            <Slider v-else v-model="colorBalance.values2.B" :step="1" :min="-100" :max="100" @on-change="changeBBalance"></Slider>
+                        </div>
+                    </template>
+            </Modal>
+   </div>
+		<script src="js/canvasTools.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/ruler.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			// 初始化canvas
+        function  getCanvasSize() {
+            this.activeImage = 'left';
+            this.wrapWidth = (this.$refs.ruleBox.clientWidth - 10) * 0.49;
+            this.wrapHeight = this.$refs.ruleBox.clientHeight - 10;
+            this.cWidth = this.$refs.canvasWrapperLeft.clientWidth;
+            this.cHeight = this.$refs.canvasWrapperLeft.clientHeight;
+            this.recordList = this.recordLeft.length ? this.recordLeft.split(',') : [];
+            this.recordList2 = this.recordRight.length ? this.recordRight.split(',') : [];
+            if (this.cmSrc.startsWith('http')) {
+                this.$util.getBase64(this.cmSrc).then(base64 => {
+                    this.leftCanvas = new CanvasTools(this.$refs.myCanvasLeft, base64);
+                    this.recordList.push('打开图片');
+                    setTimeout(() => {
+                        this.handleClickTool(0, '移动');
+                    }, 1000);
+                }).catch(() => {
+                    this.$message.error('图片转码失败');
+                });
+            } else {
+                this.leftCanvas = new CanvasTools(this.$refs.myCanvasLeft, this.cmSrc);
+                this.recordList.push('打开图片');
+                setTimeout(() => {
+                    this.handleClickTool(0, '移动');
+                }, 1000);
+            }
+            if (this.smSrc.startsWith('http')) {
+                this.$util.getBase64(this.smSrc).then(base64 => {
+                    this.rightCanvas = new CanvasTools(this.$refs.myCanvasRight, base64);
+                    this.recordList2.push('打开图片');
+                }).catch(() => {
+                    this.$message.error('图片转码失败');
+                });
+            } else {
+                this.rightCanvas = new CanvasTools(this.$refs.myCanvasRight, this.smSrc);
+                this.recordList2.push('打开图片');
+            }
+        }
+        // 点击左侧操作按钮
+        function handleClickTool(type, name) {
+            if ((this.currentAction === 2 && this.active !== 1 && this.active !== 0) || this.showAjustModal) {
+                return;
+            }
+            this.title = name;
+            this.currentAction = type;
+            this.scale.show = false;
+            this.light.show = false;
+            this.contrast.show = false;
+            this.saturation.show = false;
+            this.colorBalance.show = false;
+            this.zoomBtn = false;
+            this.cropBtn = false;
+            this.rotateBtn = false;
+            // this.rulerBtn = false;
+            console.log('handle click tool');
+            this.activeImage === 'left' ? this.leftCanvas.resetProperty() : this.rightCanvas.resetProperty();
+            switch (type) {
+                case 0: // 移动
+                    this.activeImage === 'left' ? this.leftCanvas.move() : this.rightCanvas.move();
+                    break;
+                case 1: // 标尺
+                    this.rulerBtn = true;
+                    this.myRuler = new ruler({
+                        container: this.$refs.ruleBox, // reference to DOM element to apply rulers on
+                        rulerHeight: 20, // thickness of ruler
+                        fontFamily: 'arial', // font for points
+                        fontSize: '10px',
+                        strokeStyle: '#3fafff',
+                        lineWidth: 1,
+                        enableMouseTracking: true,
+                        enableToolTip: true
+                    });
+                    break;
+                case 2: // 剪裁
+                    // this.cropBtn = true;
+                    let that = this;
+                    this.activeImage === 'left' ? this.leftCanvas.drawCrop(() => {
+                        that.cropBtn = true;
+                    }) : this.rightCanvas.drawCrop(() => {
+                        that.cropBtn = true;
+                    });
+                    break;
+                case 3: // 旋转
+                    this.rotateBtn = true;
+                    this.activeImage === 'left' ? this.leftCanvas.changeImg() : this.rightCanvas.changeImg();
+                    // this.active = 4;
+                    break;
+                case 4: // 缩放
+                    // this.zoomBtn = true;
+                    this.activeImage === 'left' ? this.leftCanvas.changeImg() : this.rightCanvas.changeImg();
+                    this.activeImage === 'left' ? this.leftCanvas.onMouseScroll('isScaleing') : this.rightCanvas.onMouseScroll('isScaleing');
+                    // this.showAjustModal = true;
+                    // this.scale.show = true;
+                    // this.active = 3;
+                    break;
+                case 5: // 亮度
+                    this.showAjustModal = true;
+                    this.light.show = true;
+                    break;
+                case 6: // 对比度
+                    this.showAjustModal = true;
+                    this.contrast.show = true;
+                    break;
+                case 7: // 自然饱和度
+                    this.showAjustModal = true;
+                    this.saturation.show = true;
+                    break;
+                case 8: // 色彩平衡
+                    this.showAjustModal = true;
+                    this.colorBalance.show = true;
+                    break;
+                case 9: // 重置
+                    this.activeImage === 'left' ? this.leftCanvas.reset() : this.rightCanvas.reset();
+                    break;
+                // case 10: // 曲线
+                //     canvasTools.move();
+                //     break;
+                // case 11: // 曝光度
+                //     canvasTools.move();
+                //     break;
+                // case 12: // 插入图形
+                //     canvasTools.move();
+                //     break;
+                // case 13: // 对比
+                //     canvasTools.move();
+                //     break;
+            }
+        }
+        // changeScale(value) {
+        //     this.activeImage === 'left' ? this.leftCanvas.scaleImg(value) : this.rightCanvas.scaleImg(value);
+        // },
+        function changeLight(value) {
+            this.activeImage === 'left' ? this.leftCanvas.light(value) : this.rightCanvas.light(value);
+        }
+        function changeContrast(value) {
+            this.activeImage === 'left' ? this.leftCanvas.contrast(value) : this.rightCanvas.contrast(value);
+        }
+        function changeSaturation(value) {
+            this.activeImage === 'left' ? this.leftCanvas.saturation(value) : this.rightCanvas.saturation(value);
+        }
+        function changeRBalance(value) {
+            this.activeImage === 'left' ? this.leftCanvas.colorBalance(value, 0, 0) : this.rightCanvas.colorBalance(value, 0, 0);
+        }
+        function  changeGBalance(value) {
+            this.activeImage === 'left' ? this.leftCanvas.colorBalance(0, value, 0) : this.rightCanvas.colorBalance(0, value, 0);
+        }
+        function  changeBBalance(value) {
+            this.activeImage === 'left' ? this.leftCanvas.colorBalance(0, 0, value) : this.rightCanvas.colorBalance(0, 0, value);
+        }
+        // 点击顶部button按钮
+        function  changeUpTools(type) { // type:0,1->剪裁  2，3->缩放   4，5，6->旋转
+            this.active = type;
+            switch (type) {
+                case 0:
+                    this.cropBtn = false;
+                    this.activeImage === 'left' ? this.leftCanvas.cancelCrop() : this.rightCanvas.cancelCrop();
+                    break;
+                case 1:
+                    if (this.activeImage === 'left') {
+                        this.leftCanvas.crop();
+                        this.recordList.push('剪裁');
+                    } else {
+                        this.rightCanvas.crop();
+                        this.recordList2.push('剪裁');
+                    }
+
+                    this.cropBtn = false;
+                    break;
+                // case 2:
+                //     this.activeImage === 'left' ? this.leftCanvas.scaleImg('out') : this.rightCanvas.scaleImg('out');
+                //     break;
+                // case 3:
+                //     this.activeImage === 'left' ? this.leftCanvas.scaleImg('in') : this.rightCanvas.scaleImg('in');
+                //     break;
+                case 4:
+                    if (this.activeImage === 'left') {
+                        this.leftCanvas.rotateImg(1);
+                        this.recordList.push('旋转');
+                    } else {
+                        this.rightCanvas.rotateImg(1);
+                        this.recordList2.push('旋转');
+                    }
+                    break;
+                case 5:
+                    if (this.activeImage === 'left') {
+                        this.leftCanvas.rotateImg(2);
+                        this.recordList.push('水平翻转');
+                    } else {
+                        this.rightCanvas.rotateImg(2);
+                        this.recordList2.push('水平翻转');
+                    }
+                    break;
+                case 6:
+                    if (this.activeImage === 'left') {
+                        this.leftCanvas.rotateImg(3);
+                        this.recordList.push('垂直翻转');
+                    } else {
+                        this.rightCanvas.rotateImg(3);
+                        this.recordList2.push('垂直翻转');
+                    }
+                    break;
+                case 7:
+                    this.myRuler.api.toggleRulerVisibility(false);
+                    break;
+                case 8:
+                    this.myRuler.api.toggleRulerVisibility(true);
+                    break;
+            }
+        }
+        // 确认色彩修改
+        function  confirmRevise() {
+            if (this.activeImage === 'left') {
+                this.scale.oldVal = this.scale.value;
+                this.light.oldVal = this.light.value;
+                this.contrast.oldVal = this.contrast.value;
+                this.saturation.oldVal = this.saturation.value;
+                this.colorBalance.values.oldRVal = this.colorBalance.values.R;
+                this.colorBalance.values.oldGVal = this.colorBalance.values.G;
+                this.colorBalance.values.oldBVal = this.colorBalance.values.B;
+                this.leftCanvas.confirm();
+                this.recordList.push(this.title);
+            } else {
+                this.scale.oldVal2 = this.scale.value2;
+                this.light.oldVal2 = this.light.value2;
+                this.contrast.oldVal2 = this.contrast.value2;
+                this.saturation.oldVal2 = this.saturation.value2;
+                this.colorBalance.values2.oldRVal = this.colorBalance.values2.R;
+                this.colorBalance.values2.oldGVal = this.colorBalance.values2.G;
+                this.colorBalance.values2.oldBVal = this.colorBalance.values2.B;
+                this.rightCanvas.confirm();
+                this.recordList2.push(this.title);
+            }
+        }
+        // 清空画布
+        function  cancelRevise() {
+            // canvasTools.clear();
+            this.activeImage === 'left' ? this.leftCanvas.clear() : this.rightCanvas.clear();
+        }
+        // 取消上一步色彩调整操作
+        function  backToUp() {
+            if (this.activeImage === 'left') {
+                this.leftCanvas.prev();
+                if (this.scale.show) {
+                    this.scale.value = this.scale.oldVal;
+                } else if (this.light.show) {
+                    this.light.value = this.light.oldVal;
+                } else if (this.contrast.show) {
+                    this.contrast.value = this.contrast.oldVal;
+                } else if (this.saturation.show) {
+                    this.saturation.value = this.saturation.oldVal;
+                } else if (this.colorBalance.show) {
+                    this.colorBalance.values.R = this.colorBalance.values.oldRVal;
+                    this.colorBalance.values.G = this.colorBalance.values.oldGVal;
+                    this.colorBalance.values.B = this.colorBalance.values.oldBVal;
+                }
+            } else {
+                this.rightCanvas.prev();
+                if (this.scale.show) {
+                    this.scale.value2 = this.scale.oldVal2;
+                } else if (this.light.show) {
+                    this.light.value2 = this.light.oldVal2;
+                } else if (this.contrast.show) {
+                    this.contrast.value2 = this.contrast.oldVal2;
+                } else if (this.saturation.show) {
+                    this.saturation.value2 = this.saturation.oldVal2;
+                } else if (this.colorBalance.show) {
+                    this.colorBalance.values2.R = this.colorBalance.values2.oldRVal;
+                    this.colorBalance.values2.G = this.colorBalance.values2.oldGVal;
+                    this.colorBalance.values2.B = this.colorBalance.values2.oldBVal;
+                }
+            }
+        }
+        // 保存
+        function  saveAjustImage() {
+            let data = {};
+            if (this.activeImage === 'left') {
+                data = {
+                    type: this.activeImage,
+                    cm_image: this.cmSrc && this.leftCanvas.save(),
+                    records: this.recordList
+                };
+            } else {
+                data = {
+                    type: this.activeImage,
+                    sm_image: this.smSrc && this.rightCanvas.save(),
+                    records2: this.recordList2
+                };
+            }
+            return data;
+        }
+        function switchActive(type) {
+            // 解决mouseup和click冒泡的问题
+            if ((this.currentAction === 2 && this.activeImage === type) || this.activeImage === type) {
+                return;
+            }
+            if (this.cmSrc && this.smSrc) {
+                if ((this.currentAction === 2 && this.active !== 1 && this.active !== 0) || this.showAjustModal) {
+                    return;
+                }
+                this.activeImage = type;
+                // if (type === 'left') {
+                //     this.leftCanvas.resetProperty();
+                // } else {
+                //     this.rightCanvas.resetProperty();
+                // }
+                console.log('switch active');
+                this.handleClickTool(this.currentAction, this.menuList[this.currentAction]);
+            }
+        }
+		</script>
+	</body>
+</html>
